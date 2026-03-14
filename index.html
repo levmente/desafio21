@@ -14,15 +14,13 @@
   --purple-border:#2A1A4E;
   --green:#22C55E;
   --bg:#0A0A0F;
-  --bg2:#111118;
   --bg3:#16161E;
   --border:#1E1E2E;
-  --text:#F0F0F0;
   --muted:#888;
   --subtle:#AAAAAA;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;line-height:1.6;overflow-x:hidden}
+body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;line-height:1.6;overflow-x:hidden}
 .wrap{max-width:620px;margin:0 auto;padding:0 1.25rem;position:relative;z-index:1}
 .glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(127,119,221,0.08) 0%,transparent 70%);pointer-events:none;z-index:0}
 .hero{padding:3.5rem 0 2rem;text-align:center}
@@ -32,16 +30,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:1rem;color:#fff;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;color:var(--purple-light)}
 .hero-sub{font-size:15px;color:var(--subtle);line-height:1.7;max-width:480px;margin:0 auto 2rem}
-.vsl-container{position:relative;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border)}
-.vsl-container iframe{display:block;width:100%;aspect-ratio:16/9;border:none}
+.vsl-container{position:relative;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border);cursor:pointer}
+.vsl-thumb{width:100%;display:block}
+.vsl-iframe-wrap{display:none;position:absolute;top:0;left:0;width:100%;height:100%}
+.vsl-iframe-wrap iframe{width:100%;height:100%;border:none}
 .reveal-section{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease;pointer-events:none}
 .reveal-section.visible{opacity:1;transform:translateY(0);pointer-events:all}
-.cta-box{text-align:center;padding:2.5rem 2rem;background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:16px;margin:2rem 0;position:relative;overflow:hidden}
+.cta-box{text-align:center;padding:2.5rem 2rem;background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:16px;margin:2rem 0}
 .cta-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-light);margin-bottom:1rem}
 .price-anchor{font-size:14px;color:var(--muted);text-decoration:line-through;margin-bottom:.25rem}
 .price-value{font-size:52px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:.25rem}
 .price-detail{font-size:13px;color:var(--muted);margin-bottom:2rem}
-.btn-cta{display:block;width:100%;max-width:400px;margin:0 auto;padding:18px 24px;background:var(--purple);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:all .2s;letter-spacing:-.01em}
+.btn-cta{display:block;width:100%;max-width:400px;margin:0 auto;padding:18px 24px;background:var(--purple);border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;transition:all .2s}
 .btn-cta:hover{background:var(--purple-dark);transform:translateY(-1px)}
 .secure-line{font-size:12px;color:#555;margin-top:1rem}
 .divider{height:1px;background:var(--border);margin:3rem 0}
@@ -96,7 +96,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .timer-text{font-size:13px;color:var(--subtle)}
 .timer-cta{padding:.6rem 1.25rem;background:var(--purple);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
 .timer-cta:hover{background:var(--purple-dark)}
-.footer{text-align:center;padding:2rem 0 3rem;border-top:1px solid var(--border)}
+.footer{text-align:center;padding:2rem 0 4rem;border-top:1px solid var(--border)}
 .footer p{font-size:12px;color:#333}
 .footer a{color:var(--purple-light);text-decoration:none}
 @media(max-width:480px){
@@ -110,19 +110,27 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <body>
 <div class="glow"></div>
 <div class="wrap">
+
   <div class="hero">
     <div class="hero-eyebrow">Desafio 21 Dias — Levanta e Vai</div>
     <h1>Você não é preguiçoso.<br>Seu cérebro só aprendeu<br>o <em>padrão errado</em> de agir.</h1>
     <p class="hero-sub">Durante 21 dias você vai aprender como destravar sua mente e sair do ciclo da procrastinação.</p>
   </div>
-  <div class="vsl-container">
-    <iframe src="https://drive.google.com/file/d/1haDYXWlmTUlZ14S_zEx1O_JgRyRATgtn/preview" allow="autoplay" allowfullscreen></iframe>
+
+  <div class="vsl-container" id="vslBox" onclick="playVideo()">
+    <img src="thumbnail.jpg" class="vsl-thumb" alt="Assista o vídeo">
+    <div class="vsl-iframe-wrap" id="vslIframe">
+      <iframe src="https://drive.google.com/file/d/1haDYXWlmTUlZ14S_zEx1O_JgRyRATgtn/preview?autoplay=1" allow="autoplay" allowfullscreen></iframe>
+    </div>
   </div>
+
   <div class="timer-bar" id="timerBar">
     <span class="timer-text">Pronto para começar?</span>
     <a href="https://pay.kiwify.com.br/dcLtCoe" class="timer-cta">Garantir meu acesso — R$147</a>
   </div>
+
   <div class="reveal-section" id="revealSection">
+
     <div class="cta-box" style="margin-top:2rem">
       <div class="cta-label">oferta de lançamento</div>
       <div class="price-anchor">de R$197</div>
@@ -131,7 +139,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <a href="https://pay.kiwify.com.br/dcLtCoe" class="btn-cta">Quero começar o Desafio 21 Dias</a>
       <p class="secure-line">🔒 Compra 100% segura · Garantia de 7 dias sem perguntas</p>
     </div>
+
     <div class="divider-glow"></div>
+
     <div class="s-tag">isso ressoa com você?</div>
     <div class="s-title">Você sabe que tem mais a oferecer.<br>Mas algo sempre trava.</div>
     <p class="s-body">Não é falta de inteligência. Não é falta de caráter. É um padrão instalado — que pode ser quebrado.</p>
@@ -143,12 +153,16 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <li><span class="pain-dash">—</span>Sente que seu potencial está desperdiçado</li>
       <li><span class="pain-dash">—</span>Quer estar mais presente com quem ama — mas a mente não para</li>
     </ul>
+
     <div class="divider"></div>
+
     <div class="s-tag">o que é o desafio</div>
     <div class="s-title">21 dias para despertar.<br>De dentro pra fora.</div>
     <p class="s-body">Não é um curso. Não é um app de produtividade. É uma jornada guiada que combina neurociência, espiritualidade prática e ação real — projetada para quem tem uma mente que não para.</p>
     <p class="s-body">Cada dia você recebe um conteúdo que te move. Um passo. Uma percepção. Uma ação concreta. Sem sobrecarga. Sem pressão. Só progresso.</p>
+
     <div class="divider"></div>
+
     <div class="s-tag">a jornada</div>
     <div class="s-title">Como os 21 dias estão organizados</div>
     <ul class="arc-list">
@@ -177,7 +191,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         </div>
       </li>
     </ul>
+
     <div class="divider"></div>
+
     <div class="s-tag">o que você recebe</div>
     <div class="s-title">Todo dia, por 21 dias</div>
     <div class="deliverables">
@@ -188,7 +204,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="deliv-card"><span class="deliv-icon">✅</span><div class="deliv-title">Checklist visual</div><div class="deliv-desc">Acompanhe seu progresso dia a dia com clareza</div></div>
       <div class="deliv-card"><span class="deliv-icon">🙏</span><div class="deliv-title">Oração e versículo</div><div class="deliv-desc">Direção espiritual prática para quem vive pela fé</div></div>
     </div>
+
     <div class="divider"></div>
+
     <div class="s-tag">esse desafio é pra você se</div>
     <div class="s-title">Você se reconhece aqui?</div>
     <ul class="check-list">
@@ -199,7 +217,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <li><span class="check-icon">+</span>Você quer unir fé e ação de forma prática</li>
       <li><span class="check-icon">+</span>Você está pronto para se comprometer com 21 dias</li>
     </ul>
+
     <div class="divider"></div>
+
     <div class="s-tag">quem já fez</div>
     <div class="s-title">O que mudou na vida de quem completou</div>
     <div class="testimonials">
@@ -207,7 +227,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="testimonial"><div class="testimonial-text">No dia 7 eu já senti algo diferente. Uma clareza que eu não tinha há anos. No dia 21 eu era outra pessoa — com direção de verdade.</div><div class="testimonial-author">— aluno do Desafio Levanta e Vai</div></div>
       <div class="testimonial"><div class="testimonial-text">Eu tinha medo de ser mais um produto que não funcionaria pra mim. Mas o Júlio entende o que é ter uma mente acelerada. O conteúdo foi feito pra mim.</div><div class="testimonial-author">— aluno do Desafio Levanta e Vai</div></div>
     </div>
+
     <div class="divider"></div>
+
     <div class="s-tag">o que está incluído</div>
     <div class="s-title">Desafio 21 Dias — Levanta e Vai</div>
     <div class="offer-box">
@@ -220,6 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
         <li><span class="offer-dot">+</span>Áudios de meditação guiada para cada etapa da jornada</li>
       </ul>
     </div>
+
     <div class="cta-box">
       <div class="cta-label">oferta de lançamento</div>
       <div class="price-anchor">de R$197</div>
@@ -228,13 +251,17 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <a href="https://pay.kiwify.com.br/dcLtCoe" class="btn-cta">Quero começar o Desafio 21 Dias</a>
       <p class="secure-line">🔒 Compra 100% segura · Garantia de 7 dias sem perguntas</p>
     </div>
+
     <div class="divider"></div>
+
     <div class="guarantee-box">
       <span class="guarantee-icon">🔒</span>
       <div class="guarantee-title">Garantia total de 7 dias</div>
       <div class="guarantee-text">Se você começar o Desafio e por qualquer motivo sentir que não era pra você — um e-mail e devolvemos 100% do seu dinheiro.<br><br>Sem perguntas. Sem burocracia. Sem risco nenhum.<br><br>O único risco real é continuar exatamente onde você está.</div>
     </div>
+
     <div class="divider"></div>
+
     <div class="s-tag">dúvidas frequentes</div>
     <div class="s-title">Perguntas e respostas</div>
     <div class="faq-wrap">
@@ -245,24 +272,48 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Quanto tempo preciso por dia?<span class="faq-icon">+</span></div><div class="faq-a">Entre 20 e 40 minutos por dia. O conteúdo foi pensado para caber na rotina real — especialmente para quem tem TDAH.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como funciona a garantia?<span class="faq-icon">+</span></div><div class="faq-a">Você tem 7 dias para pedir reembolso integral. Basta enviar um e-mail — sem perguntas, sem burocracia. 100% do valor é devolvido.</div></div>
     </div>
+
     <div class="divider"></div>
+
     <div style="text-align:center;padding:3rem 0">
       <div class="s-title" style="font-size:24px;margin-bottom:.5rem">Você não está atrasado.<br>Você só precisa começar.</div>
       <p class="s-body" style="text-align:center;margin-bottom:2rem">21 dias. Um passo por dia. Sem pressão. Com direção.</p>
       <a href="https://pay.kiwify.com.br/dcLtCoe" class="btn-cta">Quero começar o Desafio 21 Dias</a>
       <p class="secure-line" style="margin-top:1rem">🔒 R$147 pagamento único · Acesso imediato · Garantia de 7 dias</p>
     </div>
+
     <div class="footer">
       <p>© Levanta e Vai — Júlio Giani</p>
       <p style="margin-top:.4rem">Dúvidas? Fale no Instagram <a href="https://instagram.com/juliogiani">@juliogiani</a></p>
     </div>
+
   </div>
 </div>
+
 <script>
+function playVideo(){
+  document.getElementById('vslThumb') && (document.getElementById('vslThumb').style.display='none');
+  document.querySelector('.vsl-thumb').style.display='none';
+  document.getElementById('vslIframe').style.display='block';
+  document.getElementById('vslBox').style.cursor='default';
+  document.getElementById('vslBox').onclick=null;
+}
 var revealDone=false;
-function doReveal(){if(revealDone)return;revealDone=true;document.getElementById('revealSection').classList.add('visible');document.getElementById('timerBar').classList.add('show');}
+function doReveal(){
+  if(revealDone)return;
+  revealDone=true;
+  document.getElementById('revealSection').classList.add('visible');
+  document.getElementById('timerBar').classList.add('show');
+}
 setTimeout(doReveal,420000);
-function toggleFaq(el){var a=el.nextElementSibling;var i=el.querySelector('.faq-icon');var open=a.classList.contains('open');document.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});document.querySelectorAll('.faq-icon').forEach(function(x){x.classList.remove('open');});if(!open){a.classList.add('open');i.classList.add('open');}}
+function toggleFaq(el){
+  var a=el.nextElementSibling;
+  var i=el.querySelector('.faq-icon');
+  var open=a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.faq-icon').forEach(function(x){x.classList.remove('open');});
+  if(!open){a.classList.add('open');i.classList.add('open');}
+}
 </script>
 </body>
 </html>
