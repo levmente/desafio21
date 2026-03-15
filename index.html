@@ -30,10 +30,14 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
 .hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:1rem;color:#fff;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;color:var(--purple-light)}
 .hero-sub{font-size:15px;color:var(--subtle);line-height:1.7;max-width:480px;margin:0 auto 2rem}
-.vsl-container{position:relative;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border);cursor:pointer}
-.vsl-thumb{width:100%;display:block}
-.vsl-iframe-wrap{display:none;position:absolute;top:0;left:0;width:100%;height:100%}
-.vsl-iframe-wrap iframe{width:100%;height:100%;border:none}
+.vsl-container{position:relative;border-radius:16px;overflow:hidden;background:#000;border:1px solid var(--border)}
+.vsl-thumb-wrap{position:relative;cursor:pointer;display:block}
+.vsl-thumb-wrap img{width:100%;display:block}
+.vsl-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;background:rgba(127,119,221,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s}
+.vsl-thumb-wrap:hover .vsl-play{background:rgba(83,74,183,0.95);transform:translate(-50%,-50%) scale(1.08)}
+.vsl-play::after{content:'';width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:24px solid #fff;margin-left:5px}
+.vsl-iframe-wrap{display:none;aspect-ratio:16/9}
+.vsl-iframe-wrap iframe{width:100%;height:100%;border:none;display:block}
 .reveal-section{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease;pointer-events:none}
 .reveal-section.visible{opacity:1;transform:translateY(0);pointer-events:all}
 .cta-box{text-align:center;padding:2.5rem 2rem;background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:16px;margin:2rem 0}
@@ -117,10 +121,18 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
     <p class="hero-sub">Durante 21 dias você vai aprender como destravar sua mente e sair do ciclo da procrastinação.</p>
   </div>
 
-  <div class="vsl-container" id="vslBox" onclick="playVideo()">
-    <img src="thumbnail.jpg" class="vsl-thumb" alt="Assista o vídeo">
+  <!-- VSL COM THUMBNAIL E YOUTUBE -->
+  <div class="vsl-container">
+    <div class="vsl-thumb-wrap" id="vslThumb" onclick="playVideo()">
+      <img src="thumbnail.jpg" alt="Assistir vídeo">
+      <div class="vsl-play"></div>
+    </div>
     <div class="vsl-iframe-wrap" id="vslIframe">
-      <iframe src="https://drive.google.com/file/d/1haDYXWlmTUlZ14S_zEx1O_JgRyRATgtn/preview?autoplay=1" allow="autoplay" allowfullscreen></iframe>
+      <iframe
+        src="https://www.youtube.com/embed/TAwv85c-Koo?autoplay=1&rel=0&modestbranding=1&controls=1&showinfo=0"
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+      </iframe>
     </div>
   </div>
 
@@ -292,11 +304,8 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
 
 <script>
 function playVideo(){
-  document.getElementById('vslThumb') && (document.getElementById('vslThumb').style.display='none');
-  document.querySelector('.vsl-thumb').style.display='none';
+  document.getElementById('vslThumb').style.display='none';
   document.getElementById('vslIframe').style.display='block';
-  document.getElementById('vslBox').style.cursor='default';
-  document.getElementById('vslBox').onclick=null;
 }
 var revealDone=false;
 function doReveal(){
