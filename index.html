@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Desafio 21 Dias — Levanta e Vai</title>
+
+<!-- Vturb preload para carregamento rápido -->
+<script>!function(i,n){i._plt=i._plt||(n&&n.timeOrigin?n.timeOrigin+n.now():Date.now())}(window,performance);</script>
+<link rel="preload" href="https://scripts.converteai.net/e347e7c2-1f7d-4ff4-b4a9-7ce956f3b729/players/69b83dc4a10d9a398ac4cc7d/v4/player.js" as="script">
+<link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
+<link rel="preload" href="https://cdn.converteai.net/e347e7c2-1f7d-4ff4-b4a9-7ce956f3b729/69b83d8dfaf9397e233b3286/main.m3u8" as="fetch">
+<link rel="dns-prefetch" href="https://cdn.converteai.net">
+<link rel="dns-prefetch" href="https://scripts.converteai.net">
+<link rel="dns-prefetch" href="https://images.converteai.net">
+<link rel="dns-prefetch" href="https://api.vturb.com.br">
+
+<!-- Vturb player script -->
+<script type="text/javascript">
+var s=document.createElement("script");
+s.src="https://scripts.converteai.net/e347e7c2-1f7d-4ff4-b4a9-7ce956f3b729/players/69b83dc4a10d9a398ac4cc7d/v4/player.js";
+s.async=!0;
+document.head.appendChild(s);
+</script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -30,19 +49,8 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
 .hero h1{font-size:28px;font-weight:700;line-height:1.25;margin-bottom:1rem;color:#fff;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;color:var(--purple-light)}
 .hero-sub{font-size:15px;color:var(--subtle);line-height:1.7;max-width:480px;margin:0 auto 2rem}
-
-/* VSL PLAYER */
-.vsl-outer{border-radius:16px;overflow:hidden;border:1px solid var(--purple-border);background:#000;position:relative;margin-bottom:0}
-.vsl-thumb{position:relative;cursor:pointer;display:block;aspect-ratio:16/9;overflow:hidden}
-.vsl-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
-.vsl-thumb:hover img{transform:scale(1.02)}
-.vsl-thumb-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,8,20,0.3) 0%,rgba(10,8,20,0.1) 40%,rgba(10,8,20,0.5) 100%)}
-.vsl-play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:rgba(127,119,221,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;box-shadow:0 0 40px rgba(127,119,221,0.4)}
-.vsl-thumb:hover .vsl-play-btn{transform:translate(-50%,-50%) scale(1.1);background:rgba(83,74,183,0.97)}
-.vsl-play-btn::after{content:'';width:0;height:0;border-top:16px solid transparent;border-bottom:16px solid transparent;border-left:28px solid #fff;margin-left:6px}
-.vsl-player{display:none;aspect-ratio:16/9;background:#000}
-.vsl-player iframe{width:100%;height:100%;border:none;display:block}
-
+.vsl-wrap{border-radius:16px;overflow:hidden;border:1px solid var(--purple-border);background:#000}
+.vsl-wrap vturb-smartplayer{display:block;width:100%;max-width:100%!important}
 .reveal-section{opacity:0;transform:translateY(20px);transition:opacity .8s ease,transform .8s ease;pointer-events:none}
 .reveal-section.visible{opacity:1;transform:translateY(0);pointer-events:all}
 .cta-box{text-align:center;padding:2.5rem 2rem;background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:16px;margin:2rem 0}
@@ -100,11 +108,6 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
 .faq-icon.open{transform:rotate(45deg);background:var(--purple-bg);border-color:var(--purple-border)}
 .faq-a{font-size:13px;color:var(--muted);line-height:1.8;padding-bottom:1.1rem;display:none}
 .faq-a.open{display:block}
-.timer-bar{position:fixed;bottom:0;left:0;right:0;background:var(--purple-bg);border-top:1px solid var(--purple-border);padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:center;gap:.75rem;z-index:100;transform:translateY(100%);transition:transform .5s ease}
-.timer-bar.show{transform:translateY(0)}
-.timer-text{font-size:13px;color:var(--subtle)}
-.timer-cta{padding:.6rem 1.25rem;background:var(--purple);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
-.timer-cta:hover{background:var(--purple-dark)}
 .footer{text-align:center;padding:2rem 0 4rem;border-top:1px solid var(--border)}
 .footer p{font-size:12px;color:#333}
 .footer a{color:var(--purple-light);text-decoration:none}
@@ -126,28 +129,12 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
     <p class="hero-sub">Durante 21 dias você vai aprender como destravar sua mente e sair do ciclo da procrastinação.</p>
   </div>
 
-  <!-- VSL PLAYER CUSTOMIZADO -->
-  <div class="vsl-outer">
-    <div class="vsl-thumb" id="vslThumb" onclick="playVideo()">
-      <img src="thumbnail.jpg" alt="Assistir vídeo">
-      <div class="vsl-thumb-overlay"></div>
-      <div class="vsl-play-btn"></div>
-    </div>
-    <div class="vsl-player" id="vslPlayer">
-      <iframe
-        id="vslFrame"
-        src=""
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
+  <!-- VTURB PLAYER -->
+  <div class="vsl-wrap">
+    <vturb-smartplayer id="vid-69b83dc4a10d9a398ac4cc7d" style="display:block;margin:0 auto;width:100%;max-width:100%;"></vturb-smartplayer>
   </div>
 
-  <div class="timer-bar" id="timerBar">
-    <span class="timer-text">Pronto para começar?</span>
-    <a href="https://pay.kiwify.com.br/dcLtCoe" class="timer-cta">Garantir meu acesso — R$147</a>
-  </div>
-
+  <!-- CONTEÚDO REVELADO APÓS 420s -->
   <div class="reveal-section" id="revealSection">
 
     <div class="cta-box" style="margin-top:2rem">
@@ -310,17 +297,11 @@ body{background:var(--bg);color:#F0F0F0;font-family:-apple-system,BlinkMacSystem
 </div>
 
 <script>
-function playVideo(){
-  document.getElementById('vslThumb').style.display='none';
-  document.getElementById('vslPlayer').style.display='block';
-  document.getElementById('vslFrame').src='https://www.youtube.com/embed/TAwv85c-Koo?autoplay=1&rel=0&modestbranding=1&controls=1&showinfo=0&color=white&iv_load_policy=3';
-}
 var revealDone=false;
 function doReveal(){
   if(revealDone)return;
   revealDone=true;
   document.getElementById('revealSection').classList.add('visible');
-  document.getElementById('timerBar').classList.add('show');
 }
 setTimeout(doReveal,420000);
 function toggleFaq(el){
