@@ -78,6 +78,16 @@ h2.section-title{margin:0 0 14px;font-size:clamp(30px,3.8vw,56px);line-height:1.
 <link rel="preload" href="https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js" as="script">
 <link rel="preload" href="https://cdn.converteai.net/e347e7c2-1f7d-4ff4-b4a9-7ce956f3b729/69bdafb16ced9201ea539092/main.m3u8" as="fetch">
 <link rel="dns-prefetch" href="https://cdn.converteai.net"><link rel="dns-prefetch" href="https://scripts.converteai.net"><link rel="dns-prefetch" href="https://images.converteai.net"><link rel="dns-prefetch" href="https://api.vturb.com.br">
+
+  <!-- PostHog: inicialização oficial -->
+  <script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('phc_wvTjbAx6q6rNdGdqvpJWmqon82xsYVIaFrTqRUgZWvl', {
+    api_host: 'https://us.i.posthog.com',
+    defaults: '2026-01-30'
+  });
+  </script>
+
 </head>
 <body>
 <div class="topbar"><span>Assista até o final para liberar sua condição especial.</span></div>
@@ -342,5 +352,266 @@ s.async=true;document.head.appendChild(s);
   setTimeout(safeReveal, REVEAL_AT*1000);
 })();
 </script>
+
+  <!-- Tracking global: PostHog + eventos customizados da VSL -->
+  <script>
+    (function () {
+      try {
+        // Leitura segura do lead_id da URL
+        const params = new URLSearchParams(window.location.search);
+        const leadId = params.get('lead_id');
+        const funnelPage = 'desafio21_vsl';
+
+        // Flags para evitar duplicidade
+        let pitchTracked = false;
+        const ctaShownSources = {};
+        const observedElements = new WeakSet();
+
+        // Helpers seguros para PostHog
+        function safeCapture(eventName, props) {
+          try {
+            if (window.posthog && typeof window.posthog.capture === 'function') {
+              window.posthog.capture(eventName, props || {});
+            }
+          } catch (err) {
+            console.warn('PostHog capture error:', err);
+          }
+        }
+
+        function safeIdentify(id) {
+          try {
+            if (window.posthog && typeof window.posthog.identify === 'function') {
+              window.posthog.identify(String(id));
+            }
+          } catch (err) {
+            console.warn('PostHog identify error:', err);
+          }
+        }
+
+        function safeRegister(props) {
+          try {
+            if (window.posthog && typeof window.posthog.register === 'function') {
+              window.posthog.register(props || {});
+            }
+          } catch (err) {
+            console.warn('PostHog register error:', err);
+          }
+        }
+
+        // Identify/register quando houver lead_id
+        if (leadId) {
+          safeIdentify(String(leadId));
+          safeRegister({
+            lead_id: String(leadId),
+            funnel_page: funnelPage
+          });
+        }
+
+        // Evento de abertura da VSL
+        safeCapture('vsl_opened', {
+          funnel_page: funnelPage,
+          lead_id: leadId || null,
+          current_url: window.location.href
+        });
+
+        // Evento de lead_id recebido
+        if (leadId) {
+          safeCapture('lead_id_received', {
+            funnel_page: funnelPage,
+            lead_id: String(leadId)
+          });
+        }
+
+        // Função global segura: momento do pitch
+        window.trackPitchReached = function () {
+          try {
+            if (pitchTracked) return;
+            pitchTracked = true;
+            safeCapture('pitch_reached', {
+              funnel_page: funnelPage,
+              lead_id: leadId || null
+            });
+          } catch (err) {
+            console.warn('trackPitchReached error:', err);
+          }
+        };
+
+        // Função global segura: exibição de CTA
+        window.trackCtaShown = function (source) {
+          try {
+            const key = source || 'unknown';
+            if (ctaShownSources[key]) return;
+            ctaShownSources[key] = true;
+            safeCapture('cta_shown', {
+              funnel_page: funnelPage,
+              lead_id: leadId || null,
+              source: key
+            });
+          } catch (err) {
+            console.warn('trackCtaShown error:', err);
+          }
+        };
+
+        // Função auxiliar: CTA liberado pelo tempo do vídeo
+        window.trackTimedCtaRelease = function (source) {
+          try {
+            window.trackCtaShown(source || 'timed_release');
+          } catch (err) {
+            console.warn('trackTimedCtaRelease error:', err);
+          }
+        };
+
+        // Seleção do CTA principal preferencial
+        function getPrimaryCta() {
+          return document.querySelector('#cta-button')
+            || document.querySelector('.cta-button')
+            || document.querySelector('[data-cta="true"]')
+            || document.querySelector('.hero-offer-btn')
+            || document.querySelector('#stickyOffer a')
+            || document.querySelector('.kiwify-link');
+        }
+
+        // Rastreio de visibilidade do CTA principal
+        function observePrimaryCtaVisibility() {
+          try {
+            const cta = getPrimaryCta();
+            if (!cta || observedElements.has(cta) || !('IntersectionObserver' in window)) return;
+            observedElements.add(cta);
+
+            const observer = new IntersectionObserver(function(entries) {
+              entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                  window.trackCtaShown('main_cta_visible');
+                  observer.disconnect();
+                }
+              });
+            }, { threshold: 0.35 });
+
+            observer.observe(cta);
+          } catch (err) {
+            console.warn('CTA visibility observer error:', err);
+          }
+        }
+
+        // Rastreio de cliques em CTA e checkout Kiwify
+        document.addEventListener('click', function (event) {
+          try {
+            const element = event.target && event.target.closest
+              ? event.target.closest('a, button, [data-cta="true"]')
+              : null;
+
+            if (!element) return;
+
+            const isTrackedCta =
+              element.id === 'cta-button' ||
+              element.id === 'cta-final' ||
+              (element.classList && element.classList.contains('cta-button')) ||
+              element.getAttribute('data-cta') === 'true' ||
+              (element.classList && element.classList.contains('hero-offer-btn'));
+
+            if (isTrackedCta) {
+              safeCapture('cta_clicked', {
+                funnel_page: funnelPage,
+                lead_id: leadId || null,
+                cta_id: element.id || null,
+                cta_text: (element.innerText || '').trim() || null
+              });
+            }
+
+            const link = element.closest && element.closest('a') ? element.closest('a') : (element.tagName === 'A' ? element : null);
+            if (link && link.href && link.href.includes('kiwify')) {
+              safeCapture('checkout_clicked', {
+                funnel_page: funnelPage,
+                lead_id: leadId || null,
+                destination_url: link.href,
+                link_text: (link.innerText || '').trim() || null
+              });
+            }
+          } catch (err) {
+            console.warn('Click tracking error:', err);
+          }
+        }, true);
+
+        // Observa liberação do pitch e do CTA principal
+        function watchRevealMoments() {
+          try {
+            const pageContent = document.getElementById('page-content');
+            const stickyOffer = document.getElementById('stickyOffer');
+
+            if (pageContent && 'MutationObserver' in window) {
+              const pageObserver = new MutationObserver(function () {
+                const styles = window.getComputedStyle(pageContent);
+                if (styles.display !== 'none' && parseFloat(styles.opacity || '1') > 0) {
+                  window.trackPitchReached();
+                  window.trackTimedCtaRelease('timed_release');
+                  observePrimaryCtaVisibility();
+                }
+              });
+              pageObserver.observe(pageContent, {
+                attributes: true,
+                attributeFilter: ['style', 'class']
+              });
+            }
+
+            if (stickyOffer && 'MutationObserver' in window) {
+              const stickyObserver = new MutationObserver(function () {
+                const styles = window.getComputedStyle(stickyOffer);
+                if (styles.display !== 'none') {
+                  window.trackCtaShown('mid_cta');
+                  observePrimaryCtaVisibility();
+                }
+              });
+              stickyObserver.observe(stickyOffer, {
+                attributes: true,
+                attributeFilter: ['style', 'class']
+              });
+            }
+
+            // Checagem inicial
+            setTimeout(function () {
+              try {
+                if (pageContent) {
+                  const pageStyles = window.getComputedStyle(pageContent);
+                  if (pageStyles.display !== 'none' && parseFloat(pageStyles.opacity || '1') > 0) {
+                    window.trackPitchReached();
+                    window.trackTimedCtaRelease('timed_release');
+                  }
+                }
+                if (stickyOffer) {
+                  const stickyStyles = window.getComputedStyle(stickyOffer);
+                  if (stickyStyles.display !== 'none') {
+                    window.trackCtaShown('mid_cta');
+                  }
+                }
+                observePrimaryCtaVisibility();
+              } catch (err) {
+                console.warn('Initial reveal check error:', err);
+              }
+            }, 800);
+          } catch (err) {
+            console.warn('watchRevealMoments error:', err);
+          }
+        }
+
+        // Re-observar CTA principal se o DOM mudar
+        if ('MutationObserver' in window) {
+          const ctaDomObserver = new MutationObserver(function () {
+            observePrimaryCtaVisibility();
+          });
+          ctaDomObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+        }
+
+        // Inicialização
+        watchRevealMoments();
+        observePrimaryCtaVisibility();
+      } catch (err) {
+        console.warn('Tracking bootstrap error:', err);
+      }
+    })();
+  </script>
+
 </body>
 </html>
