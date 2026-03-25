@@ -612,6 +612,165 @@ s.async=true;document.head.appendChild(s);
       }
     })();
   </script>
+<script>
+(function () {
+  const PRODUCT = 'desafio_21_dias';
+  const PAGE_TYPE = 'sales_page';
+  const FUNNEL = 'vsl';
+  const CHECKOUT_HOST_KEYWORD = 'kiwify';
 
+  let leadId = new URLSearchParams(window.location.search).get('lead_id');
+  if (!leadId) leadId = localStorage.getItem('lead_id');
+  if (leadId) localStorage.setItem('lead_id', leadId);
+
+  let vslOpenedTracked = false;
+  let offerRevealedTracked = false;
+
+  function getParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      lead_id: leadId || '',
+      utm_source: params.get('utm_source') || '',
+      utm_medium: params.get('utm_medium') || '',
+      utm_campaign: params.get('utm_campaign') || '',
+      utm_content: params.get('utm_content') || '',
+      utm_term: params.get('utm_term') || '',
+      src: params.get('src') || '',
+      result: params.get('result') || ''
+    };
+  }
+
+  function baseProps() {
+    return {
+      product: PRODUCT,
+      page_type: PAGE_TYPE,
+      funnel: FUNNEL,
+      page_url: window.location.href,
+      page_path: window.location.pathname,
+      page_title: document.title,
+      ...getParams()
+    };
+  }
+
+  function safeCapture(eventName, extraProps) {
+    try {
+      if (window.posthog && typeof window.posthog.capture === 'function') {
+        window.posthog.capture(eventName, {
+          ...baseProps(),
+          ...(extraProps || {})
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao enviar evento para o PostHog:', eventName, err);
+    }
+  }
+
+  function updateCheckoutLinks() {
+    document.querySelectorAll('a[href]').forEach(link => {
+      try {
+        const url = new URL(link.href, window.location.origin);
+
+        if (url.hostname.includes(CHECKOUT_HOST_KEYWORD) && leadId) {
+          url.searchParams.set('lead_id', leadId);
+        }
+
+        link.href = url.toString();
+      } catch (e) {}
+    });
+  }
+
+  function revealPage() {
+    const content = document.getElementById('page-content');
+    const sticky = document.getElementById('stickyOffer');
+
+    document.querySelectorAll('.hero-offer-btn').forEach(el => {
+      el.style.display = 'inline-flex';
+    });
+
+    if (sticky) sticky.style.display = 'block';
+
+    if (content && content.style.display !== 'block') {
+      content.style.display = 'block';
+      requestAnimationFrame(() => {
+        content.style.opacity = '1';
+      });
+    }
+
+    if (!offerRevealedTracked) {
+      offerRevealedTracked = true;
+      safeCapture('desafio21_offer_revealed', {
+        reveal_at_seconds: REVEAL_AT
+      });
+    }
+  }
+
+  const REVEAL_AT = 287;
+  let revealed = false;
+  const safeReveal = () => {
+    if (revealed) return;
+    revealed = true;
+    revealPage();
+  };
+
+  function trackVslOpened(currentTime) {
+    if (vslOpenedTracked) return;
+    vslOpenedTracked = true;
+    safeCapture('desafio21_vsl_opened', {
+      current_time_seconds: Number(currentTime || 0)
+    });
+  }
+
+  function handleCheckoutClick(event) {
+    const link = event.target.closest('a.kiwify-link');
+    if (!link) return;
+
+    event.preventDefault();
+
+    safeCapture('desafio21_checkout_clicked', {
+      cta_text: (link.textContent || '').trim(),
+      destination_url: link.href,
+      cta_location:
+        link.classList.contains('hero-offer-btn') ? 'hero' :
+        link.closest('#stickyOffer') ? 'sticky_offer' :
+        link.closest('#oferta') ? 'offer_section' :
+        link.closest('.footer-cta') ? 'footer_cta' :
+        'unknown'
+    });
+
+    setTimeout(() => {
+      window.location.href = link.href;
+    }, 180);
+  }
+
+  updateCheckoutLinks();
+
+  safeCapture('desafio21_page_viewed');
+
+  document.addEventListener('click', handleCheckoutClick, true);
+
+  window.addEventListener('message', function (e) {
+    try {
+      const d = e.data;
+      if (!d || typeof d !== 'object') return;
+
+      if (d.event === 'showCta') {
+        safeReveal();
+      }
+
+      if (d.event === 'timeupdate') {
+        const time = Number(d.time || d.currentTime || 0);
+        if (time > 0) trackVslOpened(time);
+        if (time >= REVEAL_AT) safeReveal();
+      }
+
+      if (d.currentTime !== undefined) {
+        const time = Number(d.currentTime || 0);
+        if (time > 0) trackVslOpened(time);
+        if (time >= REVEAL_AT) safeReveal();
+      }
+    } catch (err) {}
+  });
+})();
+</script>
 </body>
 </html>
